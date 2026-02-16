@@ -174,9 +174,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Clean local release artifact before cargo publish
+        if: steps.check_tag.outputs.exists == 'false'
+        run: rm -f orbinum-protocol-core-${{ steps.version.outputs.version }}-wasm-nodejs.tar.gz
+
       - name: Publish crate to crates.io
         if: steps.check_tag.outputs.exists == 'false'
-        run: cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
