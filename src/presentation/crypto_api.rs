@@ -94,7 +94,7 @@ impl CryptoApi {
     ///
     /// # Example
     /// ```no_run
-    /// use wallet_core_wasm::CryptoApi;
+    /// use orbinum_protocol_core::presentation::CryptoApi;
     ///
     /// let api = CryptoApi::new();
     /// let inputs = [[1u8; 32], [2u8; 32], [3u8; 32], [4u8; 32]];
