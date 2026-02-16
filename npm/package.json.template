@@ -1,0 +1,43 @@
+{
+  "name": "@orbinum/protocol-core",
+  "version": "__VERSION__",
+  "description": "Core protocol primitives and WASM bindings for interacting with Orbinum",
+  "type": "module",
+  "main": "orbinum_protocol_core.js",
+  "types": "orbinum_protocol_core.d.ts",
+  "files": [
+    "orbinum_protocol_core_bg.wasm",
+    "orbinum_protocol_core.js",
+    "orbinum_protocol_core.d.ts",
+    "orbinum_protocol_core_bg.wasm.d.ts",
+    "LICENSE-APACHE2",
+    "LICENSE-GPL3",
+    "README.md"
+  ],
+  "keywords": [
+    "orbinum",
+    "protocol",
+    "wasm",
+    "substrate",
+    "zk",
+    "privacy",
+    "commitment",
+    "nullifier"
+  ],
+  "author": "Orbinum",
+  "license": "Apache-2.0 OR GPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/orbinum/protocol-core.git"
+  },
+  "homepage": "https://github.com/orbinum/protocol-core",
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": [
+    "./snippets/*"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
