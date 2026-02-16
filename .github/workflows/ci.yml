@@ -60,12 +60,16 @@ jobs:
           toolchain: stable
           override: true
           components: clippy
+          target: wasm32-unknown-unknown
       
-      - name: Check
-        run: cargo check --all-features
+      - name: Check (native feature set)
+        run: cargo check --features "crypto,subxt-native"
+
+      - name: Check (web feature set)
+        run: cargo check --target wasm32-unknown-unknown --features "crypto-zk,subxt-web"
       
-      - name: Clippy
-        run: cargo clippy --all-features -- -D warnings
+      - name: Clippy (native feature set)
+        run: cargo clippy --features "crypto,subxt-native" -- -D warnings
 
   fmt:
     name: Format
