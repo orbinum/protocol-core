@@ -12,14 +12,15 @@ build:
 # Run tests
 test:
 	@echo "🧪 Running tests..."
-	@cargo test --all-features
+	@cargo test --features crypto
+	@cargo test --features "crypto-zk,subxt-native"
 	@echo "✅ Tests passed"
 
 # Check compilation
 check:
 	@echo "🔍 Checking code..."
-	@cargo check --all-features
-	@cargo clippy --all-features -- -D warnings
+	@cargo check --features "crypto,subxt-native"
+	@cargo clippy --features "crypto,subxt-native" -- -D warnings
 	@echo "✅ Check complete"
 
 # Clean build artifacts
