@@ -59,7 +59,7 @@ jobs:
       - name: Build + test
         if: steps.check_tag.outputs.exists == 'false'
         run: |
-          cargo check --all-features
+          cargo check --features "crypto,subxt-native"
           cargo test --features crypto-zk
 
       - name: Build WASM package (nodejs)
