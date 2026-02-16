@@ -1,11 +1,11 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use orbinum_protocol_core::TransactionApi;
 use orbinum_protocol_core::domain::entities::SignedTransaction;
 use orbinum_protocol_core::domain::types::{Address, Commitment, Hash, Nullifier};
 use orbinum_protocol_core::infrastructure::codec::encoder::ScaleEncoder;
 use orbinum_protocol_core::infrastructure::serializers::{
     serialize_signed_transaction, CallDataBuilder,
 };
+use orbinum_protocol_core::TransactionApi;
 
 #[cfg(feature = "crypto")]
 use orbinum_protocol_core::SigningApi;
