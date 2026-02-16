@@ -1,0 +1,82 @@
+[package]
+name = "orbinum-protocol-core"
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0 OR GPL-3.0-or-later"
+description = "Core protocol primitives and WASM bindings for interacting with Orbinum"
+repository = "https://github.com/orbinum/protocol-core"
+homepage = "https://github.com/orbinum/protocol-core"
+authors = ["Orbinum"]
+keywords = ["orbinum", "protocol", "wasm", "substrate", "zk"]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false
+
+[profile.release]
+panic = "abort"
+
+[profile.dev]
+panic = "abort"
+
+[features]
+default = ["std"]
+std = [
+  "codec/std",
+  "serde/std",
+  "hex/std",
+  "orbinum-zk-core/std",
+  "orbinum-encrypted-memo/std",
+]
+# Crypto features split: ZK ops (WASM-compatible) vs Signing (native-only)
+crypto-zk = []  # Poseidon, commitments, nullifiers - uses orbinum-zk-core (always available)
+crypto-signing = ["libsecp256k1", "tiny-keccak"]  # ECDSA signing for native builds
+crypto = ["crypto-zk", "crypto-signing"]  # Full crypto for native
+subxt-native = ["subxt", "subxt/native"]
+subxt-web = ["subxt", "subxt/web"]
+
+[dependencies]
+codec = { package = "parity-scale-codec", version = "3.6.9", default-features = false, features = [
+  "derive",
+] }
+serde = { version = "1.0.197", default-features = false, features = [
+  "derive",
+  "alloc",
+] }
+hex = { version = "0.4.3", default-features = false, features = [
+  "alloc",
+  "std",
+] }
+
+# ZK cryptographic primitives
+orbinum-zk-core = { version = "0.4.0", default-features = false }
+
+# Encrypted memo primitive from Orbinum Node
+orbinum-encrypted-memo = { version = "0.2.2", default-features = false, features = [
+  "parity-scale-codec",
+  "encrypt",
+] }
+
+# Optional crypto deps
+libsecp256k1 = { version = "0.7.1", optional = true }
+tiny-keccak = { version = "2.0.2", optional = true, features = ["keccak"] }
+
+# Subxt - not required for basic transaction building
+subxt = { version = "0.38.0", optional = true, default-features = false }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wee_alloc = "0.4.5"
+wasm-bindgen = "0.2.92"
+serde-wasm-bindgen = "0.6"
+getrandom = { version = "0.2", features = ["js"] }
+js-sys = "0.3"
+
+[dev-dependencies]
+serde_json = "1.0"
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "transaction_api_bench"
+harness = false
