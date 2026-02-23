@@ -31,6 +31,13 @@ use alloc::string::String;
 pub struct ZkCryptoProvider;
 
 #[cfg(any(feature = "crypto-zk", feature = "crypto"))]
+impl Default for ZkCryptoProvider {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[cfg(any(feature = "crypto-zk", feature = "crypto"))]
 impl ZkCryptoProvider {
     pub fn new() -> Self {
         Self
@@ -62,7 +69,7 @@ impl ZkCryptoProvider {
     }
 
     pub fn get_note_commitment(&self, note: &Note) -> [u8; 32] {
-        let hasher = LightPoseidonHasher::default();
+        let hasher = LightPoseidonHasher;
         let commitment = note.commitment(hasher);
         Self::field_to_bytes(commitment.inner())
     }
@@ -106,7 +113,7 @@ impl ZkCryptoProvider {
         let commitment_field = Self::bytes_to_field(commitment)?;
         let spending_key_field = Self::bytes_to_field(spending_key)?;
 
-        let hasher = LightPoseidonHasher::default();
+        let hasher = LightPoseidonHasher;
         let nullifier = hasher.hash_2([commitment_field, spending_key_field]);
 
         Ok(Self::field_to_bytes(nullifier))
@@ -116,7 +123,7 @@ impl ZkCryptoProvider {
         let left_field = Self::bytes_to_field(left)?;
         let right_field = Self::bytes_to_field(right)?;
 
-        let hasher = LightPoseidonHasher::default();
+        let hasher = LightPoseidonHasher;
         let result = hasher.hash_2([left_field, right_field]);
 
         Ok(Self::field_to_bytes(result))
@@ -128,7 +135,7 @@ impl ZkCryptoProvider {
             field_inputs[i] = Self::bytes_to_field(*input)?;
         }
 
-        let hasher = LightPoseidonHasher::default();
+        let hasher = LightPoseidonHasher;
         let result = hasher.hash_4(field_inputs);
 
         Ok(Self::field_to_bytes(result))
@@ -193,7 +200,7 @@ impl EcdsaSigner {
         let mut compressed = [0u8; 33];
         compressed[0] = prefix;
         compressed[1..].copy_from_slice(&pubkey_uncompressed[1..33]);
-        let account_id: [u8; 32] = Blake2b::<U32>::digest(&compressed).into();
+        let account_id: [u8; 32] = Blake2b::<U32>::digest(compressed).into();
         let address = Address(account_id);
 
         Ok(EcdsaSigner {
