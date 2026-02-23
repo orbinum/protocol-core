@@ -2,6 +2,8 @@
 //!
 //! Structures and utilities for managing notes and wallet state.
 
+use alloc::collections::BTreeMap;
+use alloc::vec::Vec;
 use orbinum_encrypted_memo::MemoData;
 
 /// Scanned note from the blockchain.
@@ -69,14 +71,14 @@ impl ScannedNote {
 /// Wallet balance by asset.
 #[derive(Debug, Clone, Default)]
 pub struct WalletBalance {
-    balances: std::collections::HashMap<u32, u64>,
+    balances: BTreeMap<u32, u64>,
 }
 
 impl WalletBalance {
     /// Creates a new empty balance.
     pub fn new() -> Self {
         Self {
-            balances: std::collections::HashMap::new(),
+            balances: BTreeMap::new(),
         }
     }
 
@@ -94,7 +96,7 @@ impl WalletBalance {
     }
 
     /// Gets all balances.
-    pub fn get_all_balances(&self) -> &std::collections::HashMap<u32, u64> {
+    pub fn get_all_balances(&self) -> &BTreeMap<u32, u64> {
         &self.balances
     }
 
@@ -128,7 +130,7 @@ impl NoteSelector {
         }
 
         // Sort by value (descending) for greedy selection
-        suitable_notes.sort_by_key(|note| core::cmp::Reverse(note.value()));
+        suitable_notes.sort_by_key(|note: &ScannedNote| core::cmp::Reverse(note.value()));
 
         let mut selected = Vec::new();
         let mut total = 0u64;
@@ -155,7 +157,7 @@ impl NoteSelector {
         target_amount: u64,
         asset_id: u32,
     ) -> Result<(ScannedNote, ScannedNote, u64), &'static str> {
-        let (selected, change) =
+        let (selected, change): (Vec<ScannedNote>, u64) =
             Self::select_notes_for_transfer(available_notes, target_amount, asset_id)?;
 
         if selected.len() < 2 {
