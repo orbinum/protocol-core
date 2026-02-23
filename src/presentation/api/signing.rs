@@ -56,6 +56,7 @@ impl SigningApi {
     }
 
     /// Signs and builds complete Unshield transaction.
+    #[allow(clippy::too_many_arguments)]
     pub fn sign_and_build_unshield(
         nullifier: [u8; 32],
         amount: u128,
