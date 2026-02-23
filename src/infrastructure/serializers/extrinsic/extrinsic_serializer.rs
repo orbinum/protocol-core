@@ -22,7 +22,7 @@ mod tests {
     fn test_serialize_signed_transaction() {
         let call_data = alloc::vec![1, 2, 3];
         let signature = alloc::vec![4u8; 65];
-        let address = Address::from_slice_unchecked(&[7u8; 20]);
+        let address = Address::from_slice_unchecked(&[7u8; 32]);
 
         let signed_tx = SignedTransaction::new(call_data, signature, address, 0);
         let serialized = serialize_signed_transaction(&signed_tx);

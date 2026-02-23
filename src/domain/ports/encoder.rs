@@ -120,12 +120,12 @@ mod tests {
         assert_eq!(encoder.encode_u128(11).len(), 16);
         assert_eq!(encoder.encode_bytes(&[1u8, 2u8]), vec![1u8, 2u8]);
 
-        let addr = Address::from_slice_unchecked(&[1u8; 20]);
+        let addr = Address::from_slice_unchecked(&[1u8; 32]);
         let hash = Hash::from_slice(&[2u8; 32]);
         let commitment = Commitment::from_bytes_unchecked([3u8; 32]);
         let nullifier = Nullifier::from_bytes_unchecked([4u8; 32]);
 
-        assert_eq!(encoder.encode_address(&addr).len(), 20);
+        assert_eq!(encoder.encode_address(&addr).len(), 32);
         assert_eq!(encoder.encode_hash(&hash).len(), 32);
         assert_eq!(encoder.encode_commitment(&commitment).len(), 32);
         assert_eq!(encoder.encode_nullifier(&nullifier).len(), 32);

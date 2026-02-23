@@ -20,7 +20,7 @@ mod tests {
 
     #[test]
     fn test_types_reexports_basic_usage() {
-        let address = Address::from_slice_unchecked(&[1u8; 20]);
+        let address = Address::from_slice_unchecked(&[1u8; 32]);
         let hash = Hash::from_slice(&[2u8; 32]);
         let commitment = Commitment::from_bytes_unchecked([3u8; 32]);
         let nullifier = Nullifier::from_bytes_unchecked([4u8; 32]);
@@ -29,7 +29,7 @@ mod tests {
         let public = PublicKey::from_bytes([8u8; 64]);
         let asset = AssetId::new(9);
 
-        assert_eq!(address.as_bytes(), &[1u8; 20]);
+        assert_eq!(address.as_bytes(), &[1u8; 32]);
         assert_eq!(hash.as_bytes(), &[2u8; 32]);
         assert_eq!(commitment.as_bytes(), &[3u8; 32]);
         assert_eq!(nullifier.as_bytes(), &[4u8; 32]);

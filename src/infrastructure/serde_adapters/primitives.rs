@@ -17,7 +17,7 @@ pub mod address {
     where
         D: Deserializer<'de>,
     {
-        let bytes: [u8; 20] = Deserialize::deserialize(deserializer)?;
+        let bytes: [u8; 32] = Deserialize::deserialize(deserializer)?;
         Ok(Address::from_slice_unchecked(&bytes))
     }
 }
@@ -61,13 +61,13 @@ mod tests {
     #[test]
     fn test_address_adapter_roundtrip_json() {
         let original = AddressWrapper {
-            address: Address::from_slice_unchecked(&[1u8; 20]),
+            address: Address::from_slice_unchecked(&[1u8; 32]),
         };
 
         let json = serde_json::to_string(&original).unwrap();
         let decoded: AddressWrapper = serde_json::from_str(&json).unwrap();
 
-        assert_eq!(decoded.address.as_bytes(), &[1u8; 20]);
+        assert_eq!(decoded.address.as_bytes(), &[1u8; 32]);
     }
 
     #[test]

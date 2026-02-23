@@ -60,7 +60,7 @@ impl SigningApi {
         nullifier: [u8; 32],
         amount: u128,
         asset_id: u32,
-        recipient: [u8; 20],
+        recipient: [u8; 32],
         root: [u8; 32],
         proof: Vec<u8>,
         nonce: u32,
@@ -116,11 +116,11 @@ impl SigningApi {
         TransferBuilder::build_signed(&encoder, params, nonce, &signer)
     }
 
-    /// Gets Ethereum address from private key.
+    /// Gets Substrate AccountId32 from ECDSA private key.
     ///
     /// # Returns
-    /// Ethereum address (20 bytes)
-    pub fn get_address(private_key_hex: &str) -> Result<[u8; 20], SignerError> {
+    /// AccountId32 (32 bytes) = blake2_256(compressed_secp256k1_pubkey)
+    pub fn get_address(private_key_hex: &str) -> Result<[u8; 32], SignerError> {
         let signer = Self::create_signer(private_key_hex)?;
         Ok(*signer.address().as_bytes())
     }
@@ -142,7 +142,7 @@ mod tests {
 
         let address = SigningApi::get_address(valid_key());
         assert!(address.is_ok());
-        assert_eq!(address.unwrap().len(), 20);
+        assert_eq!(address.unwrap().len(), 32);
     }
 
     #[test]
@@ -161,7 +161,7 @@ mod tests {
             [4u8; 32],
             50,
             1,
-            [5u8; 20],
+            [5u8; 32],
             [6u8; 32],
             vec![7u8; 64],
             1,

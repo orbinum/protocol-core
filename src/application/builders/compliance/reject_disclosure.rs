@@ -31,7 +31,7 @@ mod tests {
     fn test_reject_disclosure_build_unsigned() {
         let encoder = SubstrateTransactionEncoder::new();
         let params = RejectDisclosureParams {
-            auditor: Address::from_slice_unchecked(&[21u8; 20]),
+            auditor: Address::from_slice_unchecked(&[21u8; 32]),
             reason: b"Insufficient evidence".to_vec(),
         };
 
@@ -46,7 +46,7 @@ mod tests {
     #[test]
     fn test_reject_disclosure_reason_changes_encoding() {
         let encoder = SubstrateTransactionEncoder::new();
-        let auditor = Address::from_slice_unchecked(&[22u8; 20]);
+        let auditor = Address::from_slice_unchecked(&[22u8; 32]);
 
         let tx_a = RejectDisclosureBuilder::build_unsigned(
             &encoder,

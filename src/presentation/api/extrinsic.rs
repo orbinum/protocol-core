@@ -15,7 +15,7 @@ impl TransactionApi {
     pub fn build_signed_extrinsic(
         call_data: Vec<u8>,
         signature: Vec<u8>,
-        address: [u8; 20],
+        address: [u8; 32],
         nonce: u32,
     ) -> Vec<u8> {
         let unsigned_tx = UnsignedTransaction::new(call_data, nonce);
@@ -37,7 +37,7 @@ mod tests {
         let out = TransactionApi::build_signed_extrinsic(
             vec![1u8, 2u8, 3u8],
             vec![4u8; 65],
-            [5u8; 20],
+            [5u8; 32],
             1,
         );
 

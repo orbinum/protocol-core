@@ -76,15 +76,15 @@ impl TransactionBuilder {
         if nullifier.len() != 32 {
             return Err(JsValue::from_str("Nullifier must be 32 bytes"));
         }
-        if recipient.len() != 20 {
-            return Err(JsValue::from_str("Recipient must be 20 bytes"));
+        if recipient.len() != 32 {
+            return Err(JsValue::from_str("Recipient must be 32 bytes"));
         }
         if root.len() != 32 {
             return Err(JsValue::from_str("Root must be 32 bytes"));
         }
 
         let mut nullifier_bytes = [0u8; 32];
-        let mut recipient_bytes = [0u8; 20];
+        let mut recipient_bytes = [0u8; 32];
         let mut root_bytes = [0u8; 32];
         nullifier_bytes.copy_from_slice(&nullifier);
         recipient_bytes.copy_from_slice(&recipient);
@@ -243,10 +243,10 @@ impl TransactionBuilder {
                 js_sys::Reflect::get(&item, &JsValue::from_str("authorizedFrom"))?;
 
             let account = js_sys::Uint8Array::new(&account_val).to_vec();
-            if account.len() != 20 {
-                return Err(JsValue::from_str("Auditor account must be 20 bytes"));
+            if account.len() != 32 {
+                return Err(JsValue::from_str("Auditor account must be 32 bytes"));
             }
-            let mut account_bytes = [0u8; 20];
+            let mut account_bytes = [0u8; 32];
             account_bytes.copy_from_slice(&account);
 
             let public_key = if public_key_val.is_null() || public_key_val.is_undefined() {
@@ -320,11 +320,11 @@ impl TransactionBuilder {
         evidence: Option<Vec<u8>>,
         nonce: u32,
     ) -> Result<Vec<u8>, JsValue> {
-        if target.len() != 20 {
-            return Err(JsValue::from_str("Target must be 20 bytes"));
+        if target.len() != 32 {
+            return Err(JsValue::from_str("Target must be 32 bytes"));
         }
 
-        let mut target_bytes = [0u8; 20];
+        let mut target_bytes = [0u8; 32];
         target_bytes.copy_from_slice(&target);
 
         Ok(TransactionApi::build_request_disclosure_unsigned(
@@ -344,14 +344,14 @@ impl TransactionBuilder {
         disclosed_data: Vec<u8>,
         nonce: u32,
     ) -> Result<Vec<u8>, JsValue> {
-        if auditor.len() != 20 {
-            return Err(JsValue::from_str("Auditor must be 20 bytes"));
+        if auditor.len() != 32 {
+            return Err(JsValue::from_str("Auditor must be 32 bytes"));
         }
         if commitment.len() != 32 {
             return Err(JsValue::from_str("Commitment must be 32 bytes"));
         }
 
-        let mut auditor_bytes = [0u8; 20];
+        let mut auditor_bytes = [0u8; 32];
         let mut commitment_bytes = [0u8; 32];
         auditor_bytes.copy_from_slice(&auditor);
         commitment_bytes.copy_from_slice(&commitment);
@@ -372,11 +372,11 @@ impl TransactionBuilder {
         reason: Vec<u8>,
         nonce: u32,
     ) -> Result<Vec<u8>, JsValue> {
-        if auditor.len() != 20 {
-            return Err(JsValue::from_str("Auditor must be 20 bytes"));
+        if auditor.len() != 32 {
+            return Err(JsValue::from_str("Auditor must be 32 bytes"));
         }
 
-        let mut auditor_bytes = [0u8; 20];
+        let mut auditor_bytes = [0u8; 32];
         auditor_bytes.copy_from_slice(&auditor);
 
         Ok(TransactionApi::build_reject_disclosure_unsigned(
@@ -405,10 +405,10 @@ impl TransactionBuilder {
 
         let auditor_bytes = match auditor {
             Some(a) => {
-                if a.len() != 20 {
-                    return Err(JsValue::from_str("Auditor must be 20 bytes"));
+                if a.len() != 32 {
+                    return Err(JsValue::from_str("Auditor must be 32 bytes"));
                 }
-                let mut out = [0u8; 20];
+                let mut out = [0u8; 32];
                 out.copy_from_slice(&a);
                 Some(out)
             }
@@ -472,11 +472,11 @@ impl TransactionBuilder {
         address: Vec<u8>,
         nonce: u32,
     ) -> Result<Vec<u8>, JsValue> {
-        if address.len() != 20 {
-            return Err(JsValue::from_str("Address must be 20 bytes"));
+        if address.len() != 32 {
+            return Err(JsValue::from_str("Address must be 32 bytes"));
         }
 
-        let mut address_bytes = [0u8; 20];
+        let mut address_bytes = [0u8; 32];
         address_bytes.copy_from_slice(&address);
 
         Ok(TransactionApi::build_signed_extrinsic(

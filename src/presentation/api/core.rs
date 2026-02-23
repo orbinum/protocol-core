@@ -38,7 +38,7 @@ impl TransactionApi {
         nullifier: [u8; 32],
         amount: u128,
         asset_id: u32,
-        recipient: [u8; 20],
+        recipient: [u8; 32],
         root: [u8; 32],
         proof: Vec<u8>,
         nonce: u32,
@@ -48,7 +48,7 @@ impl TransactionApi {
                 .expect("Invalid nullifier: cannot be all zeros"),
             amount,
             recipient: Address::from_slice(&recipient)
-                .expect("Invalid recipient address: must be 20 bytes"),
+                .expect("Invalid recipient address: must be 32 bytes"),
             root: Hash::from_slice(&root),
             proof,
         };
@@ -110,7 +110,7 @@ mod tests {
             [3u8; 32],
             50,
             1,
-            [4u8; 20],
+            [4u8; 32],
             [5u8; 32],
             vec![6u8; 64],
             1,

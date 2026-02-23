@@ -18,7 +18,7 @@ mod tests {
         let tx = SignedTransaction::new(
             vec![1u8, 2u8],
             vec![3u8; 65],
-            Address::from_slice_unchecked(&[4u8; 20]),
+            Address::from_slice_unchecked(&[4u8; 32]),
             9,
         );
 

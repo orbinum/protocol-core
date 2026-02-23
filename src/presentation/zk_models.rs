@@ -118,7 +118,7 @@ mod tests {
     fn test_reexported_compliance_types_are_usable() {
         let params = SetAuditPolicyParams {
             auditors: vec![AuditorInfo {
-                account: crate::domain::types::Address::from_slice_unchecked(&[10u8; 20]),
+                account: crate::domain::types::Address::from_slice_unchecked(&[10u8; 32]),
                 public_key: Some([11u8; 32]),
                 authorized_from: 1,
             }],

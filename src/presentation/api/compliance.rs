@@ -31,7 +31,7 @@ impl TransactionApi {
 
     /// Builds unsigned Request Disclosure transaction.
     pub fn build_request_disclosure_unsigned(
-        target: [u8; 20],
+        target: [u8; 32],
         reason: Vec<u8>,
         evidence: Option<Vec<u8>>,
         nonce: u32,
@@ -48,7 +48,7 @@ impl TransactionApi {
 
     /// Builds unsigned Approve Disclosure transaction.
     pub fn build_approve_disclosure_unsigned(
-        auditor: [u8; 20],
+        auditor: [u8; 32],
         commitment: [u8; 32],
         zk_proof: Vec<u8>,
         disclosed_data: Vec<u8>,
@@ -67,7 +67,7 @@ impl TransactionApi {
 
     /// Builds unsigned Reject Disclosure transaction.
     pub fn build_reject_disclosure_unsigned(
-        auditor: [u8; 20],
+        auditor: [u8; 32],
         reason: Vec<u8>,
         nonce: u32,
     ) -> Vec<u8> {
@@ -86,7 +86,7 @@ impl TransactionApi {
         proof_bytes: Vec<u8>,
         public_signals: Vec<u8>,
         partial_data: Vec<u8>,
-        auditor: Option<[u8; 20]>,
+        auditor: Option<[u8; 32]>,
         nonce: u32,
     ) -> Vec<u8> {
         let params = SubmitDisclosureParams {
@@ -122,7 +122,7 @@ mod tests {
     fn test_build_set_audit_policy_unsigned() {
         let call_data = TransactionApi::build_set_audit_policy_unsigned(
             vec![AuditorInfo {
-                account: Address::from_slice_unchecked(&[1u8; 20]),
+                account: Address::from_slice_unchecked(&[1u8; 32]),
                 public_key: None,
                 authorized_from: 1,
             }],
@@ -137,7 +137,7 @@ mod tests {
     #[test]
     fn test_build_request_disclosure_unsigned() {
         let call_data = TransactionApi::build_request_disclosure_unsigned(
-            [2u8; 20],
+            [2u8; 32],
             b"valid reason".to_vec(),
             Some(vec![3u8; 4]),
             1,
@@ -149,7 +149,7 @@ mod tests {
     #[test]
     fn test_build_approve_reject_submit_batch_disclosure_unsigned() {
         let approve = TransactionApi::build_approve_disclosure_unsigned(
-            [4u8; 20],
+            [4u8; 32],
             [5u8; 32],
             vec![6u8; 8],
             vec![7u8; 8],
@@ -159,7 +159,7 @@ mod tests {
         assert_eq!(approve[1], compliance_calls::APPROVE_DISCLOSURE);
 
         let reject = TransactionApi::build_reject_disclosure_unsigned(
-            [8u8; 20],
+            [8u8; 32],
             b"reject reason".to_vec(),
             3,
         );
@@ -171,7 +171,7 @@ mod tests {
             vec![10u8; 8],
             vec![11u8; 8],
             vec![12u8; 8],
-            Some([13u8; 20]),
+            Some([13u8; 32]),
             4,
         );
         assert_eq!(submit[0], PALLET_INDEX);

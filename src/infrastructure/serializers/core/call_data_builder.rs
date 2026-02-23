@@ -272,7 +272,7 @@ mod tests {
         let unshield = b.build_unshield_call_data(
             &Nullifier::from_bytes_unchecked([3u8; 32]),
             20,
-            &Address::from_slice_unchecked(&[4u8; 20]),
+            &Address::from_slice_unchecked(&[4u8; 32]),
             &Hash::from_slice(&[5u8; 32]),
             &[6u8; 64],
             1,
@@ -320,7 +320,7 @@ mod tests {
         let b = builder();
 
         let auditors = vec![AuditorInfo {
-            account: Address::from_slice_unchecked(&[16u8; 20]),
+            account: Address::from_slice_unchecked(&[16u8; 32]),
             public_key: None,
             authorized_from: 1,
         }];
@@ -331,7 +331,7 @@ mod tests {
         assert_eq!(set_policy[1], compliance_calls::SET_AUDIT_POLICY);
 
         let request = b.build_request_disclosure_call_data(
-            &Address::from_slice_unchecked(&[17u8; 20]),
+            &Address::from_slice_unchecked(&[17u8; 32]),
             b"reason-test",
             Some(&vec![18u8; 4]),
         );
@@ -339,7 +339,7 @@ mod tests {
         assert_eq!(request[1], compliance_calls::REQUEST_DISCLOSURE);
 
         let approve = b.build_approve_disclosure_call_data(
-            &Address::from_slice_unchecked(&[19u8; 20]),
+            &Address::from_slice_unchecked(&[19u8; 32]),
             &Commitment::from_bytes_unchecked([20u8; 32]),
             &[21u8; 8],
             &[22u8; 8],
@@ -348,7 +348,7 @@ mod tests {
         assert_eq!(approve[1], compliance_calls::APPROVE_DISCLOSURE);
 
         let reject = b.build_reject_disclosure_call_data(
-            &Address::from_slice_unchecked(&[23u8; 20]),
+            &Address::from_slice_unchecked(&[23u8; 32]),
             b"reject reason",
         );
         assert_eq!(reject[0], PALLET_INDEX);

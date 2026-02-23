@@ -46,7 +46,7 @@ mod integration_tests {
 
         // Sign it
         let signature = vec![12u8; 65];
-        let address = Address::from_slice_unchecked(&[13u8; 20]);
+        let address = Address::from_slice_unchecked(&[13u8; 32]);
         let signed_tx = ExtrinsicBuilder::build_signed(unsigned_tx, &signature, address);
 
         // Serialize it
@@ -62,7 +62,7 @@ mod integration_tests {
         let params = UnshieldParams {
             nullifier: Nullifier::from_bytes_unchecked([2u8; 32]),
             amount: 500u128,
-            recipient: Address::from_slice_unchecked(&[3u8; 20]),
+            recipient: Address::from_slice_unchecked(&[3u8; 32]),
             root: Hash::from_slice(&[4u8; 32]),
             proof: vec![5u8; 128],
         };
@@ -72,7 +72,7 @@ mod integration_tests {
 
         // Sign it
         let signature = vec![14u8; 65];
-        let address = Address::from_slice_unchecked(&[15u8; 20]);
+        let address = Address::from_slice_unchecked(&[15u8; 32]);
         let signed_tx = ExtrinsicBuilder::build_signed(unsigned_tx, &signature, address);
 
         // Serialize it
@@ -103,7 +103,7 @@ mod integration_tests {
 
         // Sign it
         let signature = vec![16u8; 65];
-        let address = Address::from_slice_unchecked(&[17u8; 20]);
+        let address = Address::from_slice_unchecked(&[15u8; 32]);
         let signed_tx = ExtrinsicBuilder::build_signed(unsigned_tx, &signature, address);
 
         // Serialize it
@@ -124,8 +124,8 @@ mod integration_tests {
         let unsigned_tx = ShieldBuilder::build_unsigned(&encoder, params, vec![0u8; 32], 0);
         let signature = vec![12u8; 65];
 
-        let address1 = Address::from_slice_unchecked(&[1u8; 20]);
-        let address2 = Address::from_slice_unchecked(&[2u8; 20]);
+        let address1 = Address::from_slice_unchecked(&[1u8; 32]);
+        let address2 = Address::from_slice_unchecked(&[2u8; 32]);
 
         let signed_tx1 = ExtrinsicBuilder::build_signed(unsigned_tx.clone(), &signature, address1);
         let signed_tx2 = ExtrinsicBuilder::build_signed(unsigned_tx, &signature, address2);
@@ -145,7 +145,7 @@ mod integration_tests {
         };
         let unsigned_tx = ShieldBuilder::build_unsigned(&encoder, params, vec![0u8; 32], 0);
         let signature = vec![12u8; 65];
-        let address = Address::from_slice_unchecked(&[13u8; 20]);
+        let address = Address::from_slice_unchecked(&[13u8; 32]);
 
         let signed_tx = ExtrinsicBuilder::build_signed(unsigned_tx, &signature, address);
 

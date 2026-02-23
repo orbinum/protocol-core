@@ -34,7 +34,7 @@ mod tests {
             &encoder,
             SetAuditPolicyParams {
                 auditors: vec![AuditorInfo {
-                    account: Address::from_slice_unchecked(&[1u8; 20]),
+                    account: Address::from_slice_unchecked(&[1u8; 32]),
                     public_key: None,
                     authorized_from: 0,
                 }],
@@ -47,7 +47,7 @@ mod tests {
         let request = RequestDisclosureBuilder::build_unsigned(
             &encoder,
             RequestDisclosureParams {
-                target: Address::from_slice_unchecked(&[2u8; 20]),
+                target: Address::from_slice_unchecked(&[2u8; 32]),
                 reason: b"review".to_vec(),
                 evidence: None,
             },
@@ -57,7 +57,7 @@ mod tests {
         let approve = ApproveDisclosureBuilder::build_unsigned(
             &encoder,
             ApproveDisclosureParams {
-                auditor: Address::from_slice_unchecked(&[3u8; 20]),
+                auditor: Address::from_slice_unchecked(&[3u8; 32]),
                 commitment: Commitment::from_bytes_unchecked([4u8; 32]),
                 zk_proof: vec![1u8; 64],
                 disclosed_data: vec![2u8; 8],
@@ -68,7 +68,7 @@ mod tests {
         let reject = RejectDisclosureBuilder::build_unsigned(
             &encoder,
             RejectDisclosureParams {
-                auditor: Address::from_slice_unchecked(&[5u8; 20]),
+                auditor: Address::from_slice_unchecked(&[5u8; 32]),
                 reason: b"not enough".to_vec(),
             },
             4,
@@ -81,7 +81,7 @@ mod tests {
                 proof_bytes: vec![7u8; 64],
                 public_signals: vec![8u8; 32],
                 partial_data: vec![9u8; 16],
-                auditor: Some(Address::from_slice_unchecked(&[10u8; 20])),
+                auditor: Some(Address::from_slice_unchecked(&[10u8; 32])),
             },
             5,
         );

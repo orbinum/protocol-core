@@ -147,7 +147,7 @@ mod tests {
         let unshield = UnshieldParams {
             nullifier: Nullifier::from_bytes_unchecked([4u8; 32]),
             amount: 20,
-            recipient: Address::from_slice_unchecked(&[5u8; 20]),
+            recipient: Address::from_slice_unchecked(&[5u8; 32]),
             root: Hash::from_slice(&[6u8; 32]),
             proof: vec![7u8; 16],
         };
@@ -173,7 +173,7 @@ mod tests {
 
         let set_audit_policy = SetAuditPolicyParams {
             auditors: vec![AuditorInfo {
-                account: Address::from_slice_unchecked(&[16u8; 20]),
+                account: Address::from_slice_unchecked(&[16u8; 32]),
                 public_key: Some([17u8; 32]),
                 authorized_from: 1,
             }],
@@ -186,7 +186,7 @@ mod tests {
         );
 
         let request_disclosure = RequestDisclosureParams {
-            target: Address::from_slice_unchecked(&[18u8; 20]),
+            target: Address::from_slice_unchecked(&[18u8; 32]),
             reason: b"reason".to_vec(),
             evidence: Some(vec![19u8; 4]),
         };
@@ -196,7 +196,7 @@ mod tests {
         );
 
         let approve_disclosure = ApproveDisclosureParams {
-            auditor: Address::from_slice_unchecked(&[20u8; 20]),
+            auditor: Address::from_slice_unchecked(&[20u8; 32]),
             commitment: Commitment::from_bytes_unchecked([21u8; 32]),
             zk_proof: vec![22u8; 32],
             disclosed_data: vec![23u8; 8],
@@ -207,7 +207,7 @@ mod tests {
         );
 
         let reject_disclosure = RejectDisclosureParams {
-            auditor: Address::from_slice_unchecked(&[24u8; 20]),
+            auditor: Address::from_slice_unchecked(&[24u8; 32]),
             reason: b"reject".to_vec(),
         };
         assert_eq!(

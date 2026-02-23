@@ -150,7 +150,7 @@ mod tests {
         let unshield = UnshieldParams {
             nullifier: crate::domain::types::Nullifier::from_bytes_unchecked([3u8; 32]),
             amount: 10,
-            recipient: crate::domain::types::Address::from_slice_unchecked(&[4u8; 20]),
+            recipient: crate::domain::types::Address::from_slice_unchecked(&[4u8; 32]),
             root: crate::domain::types::Hash::from_slice(&[5u8; 32]),
             proof: vec![6u8; 64],
         };
@@ -177,7 +177,7 @@ mod tests {
 
         let set_policy = SetAuditPolicyParams {
             auditors: vec![AuditorInfo {
-                account: crate::domain::types::Address::from_slice_unchecked(&[15u8; 20]),
+                account: crate::domain::types::Address::from_slice_unchecked(&[15u8; 32]),
                 public_key: None,
                 authorized_from: 1,
             }],
@@ -189,7 +189,7 @@ mod tests {
         assert_eq!(set_policy_data[1], compliance_calls::SET_AUDIT_POLICY);
 
         let request = RequestDisclosureParams {
-            target: crate::domain::types::Address::from_slice_unchecked(&[16u8; 20]),
+            target: crate::domain::types::Address::from_slice_unchecked(&[16u8; 32]),
             reason: b"request reason".to_vec(),
             evidence: Some(vec![17u8; 4]),
         };
@@ -198,7 +198,7 @@ mod tests {
         assert_eq!(request_data[1], compliance_calls::REQUEST_DISCLOSURE);
 
         let approve = ApproveDisclosureParams {
-            auditor: crate::domain::types::Address::from_slice_unchecked(&[18u8; 20]),
+            auditor: crate::domain::types::Address::from_slice_unchecked(&[18u8; 32]),
             commitment: crate::domain::types::Commitment::from_bytes_unchecked([19u8; 32]),
             zk_proof: vec![20u8; 8],
             disclosed_data: vec![21u8; 8],
@@ -208,7 +208,7 @@ mod tests {
         assert_eq!(approve_data[1], compliance_calls::APPROVE_DISCLOSURE);
 
         let reject = RejectDisclosureParams {
-            auditor: crate::domain::types::Address::from_slice_unchecked(&[22u8; 20]),
+            auditor: crate::domain::types::Address::from_slice_unchecked(&[22u8; 32]),
             reason: b"reject reason".to_vec(),
         };
         let reject_data = encoder.encode_reject_disclosure_call_data(&reject);

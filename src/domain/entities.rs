@@ -83,7 +83,11 @@ impl SignedTransaction {
         // Business rules enforcement
         assert!(!call_data.is_empty(), "Call data cannot be empty");
         assert!(!signature.is_empty(), "Signature cannot be empty");
-        assert_eq!(signature.len(), 65, "ECDSA signature must be 65 bytes");
+        assert!(
+            signature.len() == 64 || signature.len() == 65,
+            "Signature must be 64 bytes (Sr25519/Ed25519) or 65 bytes (ECDSA), got {}",
+            signature.len()
+        );
 
         SignedTransaction {
             call_data,
@@ -160,13 +164,13 @@ mod tests {
 
     #[test]
     fn test_signed_transaction_new_and_accessors() {
-        let address = Address::from_slice_unchecked(&[7u8; 20]);
+        let address = Address::from_slice_unchecked(&[7u8; 32]);
         let signature = vec![5u8; 65];
         let tx = SignedTransaction::new(vec![1u8, 2u8], signature.clone(), address, 3);
 
         assert_eq!(tx.call_data(), &[1u8, 2u8]);
         assert_eq!(tx.signature(), &signature);
-        assert_eq!(tx.address().as_bytes(), &[7u8; 20]);
+        assert_eq!(tx.address().as_bytes(), &[7u8; 32]);
         assert_eq!(tx.nonce(), 3);
         assert!(tx.validate().is_ok());
         assert!(tx.is_ready_for_broadcast());
@@ -175,14 +179,14 @@ mod tests {
     #[test]
     #[should_panic(expected = "Signature cannot be empty")]
     fn test_signed_transaction_new_panics_on_empty_signature() {
-        let address = Address::from_slice_unchecked(&[1u8; 20]);
+        let address = Address::from_slice_unchecked(&[1u8; 32]);
         let _ = SignedTransaction::new(vec![1u8], vec![], address, 0);
     }
 
     #[test]
-    #[should_panic(expected = "ECDSA signature must be 65 bytes")]
+    #[should_panic(expected = "Signature must be 64 bytes")]
     fn test_signed_transaction_new_panics_on_invalid_signature_length() {
-        let address = Address::from_slice_unchecked(&[1u8; 20]);
-        let _ = SignedTransaction::new(vec![1u8], vec![2u8; 64], address, 0);
+        let address = Address::from_slice_unchecked(&[1u8; 32]);
+        let _ = SignedTransaction::new(vec![1u8], vec![2u8; 63], address, 0);
     }
 }

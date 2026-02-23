@@ -6,6 +6,8 @@ use crate::domain::types::identifiers::AssetId;
 use crate::infrastructure::crypto::ZkCryptoProvider;
 #[cfg(any(feature = "crypto-zk", feature = "crypto"))]
 use crate::presentation::zk_models::{NoteData, NullifierData};
+use alloc::format;
+use alloc::string::String;
 #[cfg(any(feature = "crypto-zk", feature = "crypto"))]
 use orbinum_zk_core::NoteDto;
 

@@ -4,6 +4,8 @@
 use crate::application::errors::ValidationError;
 use crate::application::params::{AuditorInfo, DisclosureConditionType};
 use crate::domain::types::Address;
+use alloc::format;
+use alloc::string::ToString;
 
 /// Validator for compliance-related parameters
 pub struct ComplianceValidator;
@@ -55,7 +57,7 @@ impl ComplianceValidator {
     /// Validates a single auditor.
     pub fn validate_auditor(auditor: &AuditorInfo) -> Result<(), ValidationError> {
         // Validate address is not all zeros
-        if auditor.account.as_bytes() == &[0u8; 20] {
+        if auditor.account.as_bytes() == &[0u8; 32] {
             return Err(ValidationError::AddressInvalid {
                 field: "auditor.account".to_string(),
                 reason: "address cannot be all zeros".to_string(),
@@ -262,7 +264,7 @@ impl ComplianceValidator {
     /// # Returns
     /// `Ok(())` if valid, `ValidationError` otherwise
     pub fn validate_target_address(target: &Address) -> Result<(), ValidationError> {
-        if target.as_bytes() == &[0u8; 20] {
+        if target.as_bytes() == &[0u8; 32] {
             return Err(ValidationError::AddressInvalid {
                 field: "target".to_string(),
                 reason: "target address cannot be all zeros".to_string(),
@@ -307,7 +309,7 @@ mod tests {
 
     fn create_valid_auditor() -> AuditorInfo {
         AuditorInfo {
-            account: Address::from_slice_unchecked(&[1u8; 20]),
+            account: Address::from_slice_unchecked(&[1u8; 32]),
             public_key: Some([2u8; 32]),
             authorized_from: 100,
         }
@@ -322,7 +324,7 @@ mod tests {
     #[test]
     fn test_validate_auditor_zero_address() {
         let mut auditor = create_valid_auditor();
-        auditor.account = Address::from_slice_unchecked(&[0u8; 20]);
+        auditor.account = Address::from_slice_unchecked(&[0u8; 32]);
         let result = ComplianceValidator::validate_auditor(&auditor);
         assert!(result.is_err());
     }
@@ -332,7 +334,7 @@ mod tests {
         let auditors = vec![
             create_valid_auditor(),
             AuditorInfo {
-                account: Address::from_slice_unchecked(&[2u8; 20]),
+                account: Address::from_slice_unchecked(&[2u8; 32]),
                 public_key: None,
                 authorized_from: 200,
             },
@@ -443,7 +445,7 @@ mod tests {
     fn test_validate_auditor_list_too_many() {
         let mut auditors = Vec::new();
         for i in 0..101u8 {
-            let mut bytes = [0u8; 20];
+            let mut bytes = [0u8; 32];
             bytes[0] = i.saturating_add(1);
             auditors.push(AuditorInfo {
                 account: Address::from_slice_unchecked(&bytes),
@@ -557,13 +559,13 @@ mod tests {
 
     #[test]
     fn test_validate_target_address_success() {
-        let target = Address::from_slice_unchecked(&[9u8; 20]);
+        let target = Address::from_slice_unchecked(&[9u8; 32]);
         assert!(ComplianceValidator::validate_target_address(&target).is_ok());
     }
 
     #[test]
     fn test_validate_target_address_zero() {
-        let target = Address::from_slice_unchecked(&[0u8; 20]);
+        let target = Address::from_slice_unchecked(&[0u8; 32]);
         let result = ComplianceValidator::validate_target_address(&target);
         assert!(result.is_err());
         assert!(matches!(

@@ -31,7 +31,7 @@ mod tests {
     fn test_approve_disclosure_build_unsigned() {
         let encoder = SubstrateTransactionEncoder::new();
         let params = ApproveDisclosureParams {
-            auditor: Address::from_slice_unchecked(&[1u8; 20]),
+            auditor: Address::from_slice_unchecked(&[1u8; 32]),
             commitment: Commitment::from_bytes_unchecked([2u8; 32]),
             zk_proof: vec![10u8; 128],
             disclosed_data: vec![20u8; 16],
@@ -53,7 +53,7 @@ mod tests {
         let tx_a = ApproveDisclosureBuilder::build_unsigned(
             &encoder,
             ApproveDisclosureParams {
-                auditor: Address::from_slice_unchecked(&[4u8; 20]),
+                auditor: Address::from_slice_unchecked(&[4u8; 32]),
                 commitment: base_commitment,
                 zk_proof: vec![1u8; 64],
                 disclosed_data: vec![2u8; 8],
@@ -64,7 +64,7 @@ mod tests {
         let tx_b = ApproveDisclosureBuilder::build_unsigned(
             &encoder,
             ApproveDisclosureParams {
-                auditor: Address::from_slice_unchecked(&[4u8; 20]),
+                auditor: Address::from_slice_unchecked(&[4u8; 32]),
                 commitment: base_commitment,
                 zk_proof: vec![9u8; 64],
                 disclosed_data: vec![8u8; 8],

@@ -247,8 +247,8 @@ mod tests {
         let signer = signer.unwrap();
         let addr = signer.address();
 
-        // Verificar que la dirección tiene 20 bytes
-        assert_eq!(addr.as_bytes().len(), 20);
+        // Check that the address is 32 bytes (AccountId32)
+        assert_eq!(addr.as_bytes().len(), 32);
     }
 
     #[test]
