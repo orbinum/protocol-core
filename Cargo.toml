@@ -1,6 +1,6 @@
 [package]
 name = "orbinum-protocol-core"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 license = "Apache-2.0 OR GPL-3.0-or-later"
 description = "Core protocol primitives and WASM bindings for interacting with Orbinum"

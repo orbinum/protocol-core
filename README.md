@@ -2,47 +2,94 @@
 
 Core Rust/WASM protocol library for building and encoding Orbinum shielded-pool transactions.
 
-`orbinum-protocol-core` provides a clean, feature-gated API for:
-- unsigned call-data construction,
-- signed extrinsic building,
-- compliance/disclosure transaction flows,
-- ZK helper operations (commitment, nullifier, Poseidon hashing),
-- JavaScript/TypeScript consumption through WASM bindings.
-
-## Status
-
-- Version: `0.1.0` (initial release)
-- Maturity: active development (MVP hardening phase)
-- Runtime scope: Substrate/Frontier-compatible transaction payloads
+**Universal Package**: Works seamlessly in **Node.js**, **Browsers**, **Rust Native**, and **WASM Runtimes** (Polkadot, Near, etc.).
 
 ## Features
 
-- `std` (default)
-- `crypto-zk`
-- `crypto-signing`
-- `crypto` (enables both `crypto-zk` and `crypto-signing`)
-- `subxt-native`
-- `subxt-web`
+- **Universal WASM**: Single package supports `require('fs')` in Node and `fetch()` in Web.
+- **Native Rust**: Full support for `no_std` environments and native binary compilation.
+- **Type-safe**: Generated from runtime metadata using Subxt.
+- **Zero-Knowledge Primitives**: Poseidon hashing, commitment generation, nullifier computation.
+- **Transaction Building**: Create unsigned transactions for Note Transfer, Shielding, and Unshielding.
+- **Clean Architecture**: Domain-driven design with clear separation of concerns.
 
-## Build
+## Installation
+
+### JavaScript / TypeScript (npm)
 
 ```bash
-cargo build --release --features crypto
+npm install @orbinum/protocol-core
 ```
 
-## WASM
+### Rust (Cargo)
 
-```bash
-wasm-pack build --target web --out-dir pkg --release --features crypto-zk
-wasm-pack build --target nodejs --out-dir pkg-node --release --features crypto-zk
+```toml
+[dependencies]
+orbinum-protocol-core = "0.2.0"
 ```
 
-## Validate
+## Usage
+
+### Web / Browser (React, Next.js)
+
+The npm package automatically uses `fetch` to load the WASM binary.
+
+```typescript
+import { Crypto, TransactionBuilder } from '@orbinum/protocol-core';
+
+async function main() {
+  // Initialize WASM (downloads from CDN or local asset)
+  await Crypto.init(); 
+
+  // Create a Note Commitment
+  const commitment = Crypto.computeCommitment("100", 1, ownerPubkey, blinding);
+  console.log("Commitment:", commitment);
+}
+```
+
+### Node.js (Backend)
+
+The npm package automatically uses `fs` to load the WASM binary.
+
+```javascript
+const { Crypto } = require('@orbinum/protocol-core');
+
+async function main() {
+  // Initialize WASM (loads from disk)
+  await Crypto.init();
+  
+  const hash = Crypto.poseidonHash2(left, right);
+  console.log("Hash:", hash);
+}
+```
+
+### Rust (Native / WASM Runtime)
+
+Ideal for CLI tools, Substrate pallets, or generic WASM actors.
+
+```rust
+use orbinum_protocol_core::{CryptoApi, TransactionBuilder};
+
+fn main() {
+    // Native Rust code (no WASM initialization needed)
+    let commitment = CryptoApi::compute_commitment(
+        "100", 
+        1, 
+        &owner_pubkey, 
+        &blinding
+    ).unwrap();
+    
+    println!("Commitment: {:?}", commitment);
+}
+```
+
+## Build from Source
+
+To build the universal package locally (requires `rust`, `wasm-pack`, and `node`):
 
 ```bash
-make fmt
-make test
-make bench
+# Build both targets (pkg/web and pkg/node)
+make wasm-all
 ```
 
 ## Documentation
@@ -55,3 +102,4 @@ This README is intentionally brief. Full documentation is in `docs/`:
 ## License
 
 Apache-2.0 OR GPL-3.0-or-later
+

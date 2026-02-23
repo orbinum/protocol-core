@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `Cargo.toml`: added `path` dependency on local `orbinum-zk-core` to access `poseidon_hash_1`
+
+### Added
+- **Universal NPM Package**: Support for both Node.js (CommonJS/fs) and Web (ESM/fetch) environments in a single package.
+- **Hybrid CI Build**: `release.yml` now generates both `pkg/node` and `pkg/web` artifacts.
+- **Conditional Exports**: `package.json` configured with `exports` field to automatically select the correct build based on the environment (`browser` vs `node`).
+- **Documentation**: Updated README with instructions for JS/TS (Universal), Rust Native, and WASM Runtimes.
+- **Selective Disclosure Witness API** (`src/application/disclosure.rs`):
+  - `create_disclosure_witness()` — builds circuit inputs for `disclosure.circom` Groth16 proof
+  - `DisclosureWitness` struct with 4 public inputs + 7 private inputs as `[u8; 32]` field elements and disclosure flags
+  - `DisclosureError` enum (`InvalidMask`, `CryptoError`)
+  - Support for all 7 valid mask combinations (value, asset_id, owner hash)
+- **`poseidon_hash_1()`** added to `ZkCryptoProvider` (single-input Poseidon hash for viewing key)
+- **WASM binding** `Crypto::buildDisclosureInputs()` exported to JavaScript/TypeScript
+- **18 new tests** (11 unit + 7 integration) in `src/application/disclosure.rs` — all pass
+- **Criterion benchmark** `bench_build_disclosure_witness` — ~12.7 µs (release profile)
+- **E2E test** `tests/disclosure.test.ts`: full encrypt → decrypt → witness → proof → verify flow (1034ms)
+- **E2E test** `tests/shield-and-disclose.test.ts`: Alice shields, generates ZK disclosure proof, Bob verifies (379ms)
+
+### Changed
+- Refactored `release.yml` to support multi-target WASM compilation.
+- Updated `Cargo.toml` version to `0.2.0`.
+
 ## [0.1.0] - 2026-02-16
 
 ### Added
