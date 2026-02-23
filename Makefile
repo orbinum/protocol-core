@@ -1,4 +1,4 @@
-.PHONY: all build test check clean wasm wasm-node examples doc help
+.PHONY: all build test check clean wasm wasm-node wasm-all examples doc help
 
 # Default target
 all: check test
@@ -30,15 +30,6 @@ clean:
 	@rm -rf pkg pkg-node target
 	@echo "✅ Clean complete"
 
-# Build for web (with ZK crypto, no signing)
-build-web:
-	@echo "🌐 Building for web (with crypto-zk)..."
-	@wasm-pack build --target web --out-dir pkg --release --features crypto-zk
-	@echo "✅ Web build complete: pkg/"
-	@echo "   ✅ Poseidon hash available"
-	@echo "   ✅ Commitments/Nullifiers available"
-	@echo "   ❌ Signing NOT available (use @polkadot/keyring)"
-
 # Build WASM for web (with ZK crypto, no signing)
 wasm:
 	@echo "🌐 Building WASM for web (with crypto-zk)..."
@@ -55,7 +46,7 @@ wasm-node:
 	@echo "✅ WASM Node build complete: pkg-node/"
 
 # Build all WASM targets
-wasm-all: build-web wasm wasm-node
+wasm-all: wasm wasm-node
 
 # Format code
 fmt:
@@ -77,8 +68,7 @@ help:
 	@echo "  make test        - Run all tests"
 	@echo "  make check       - Check code and run clippy"
 	@echo "  make clean       - Clean build artifacts"
-	@echo "  make build-web   - Build for web"
-	@echo "  make wasm        - Build WASM for web"
+	@echo "  make wasm        - Build WASM for web (--target web, crypto-zk)
 	@echo "  make wasm-node   - Build WASM for Node.js"
 	@echo "  make wasm-all    - Build all WASM targets"
 	@echo "  make fmt         - Format code"
