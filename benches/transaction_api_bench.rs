@@ -35,7 +35,7 @@ fn bench_build_unshield_unsigned(c: &mut Criterion) {
                 black_box([3u8; 32]),
                 black_box(500u128),
                 black_box(1u32),
-                black_box([4u8; 20]),
+                black_box([4u8; 32]),
                 black_box([5u8; 32]),
                 black_box(vec![6u8; 192]),
                 black_box(1u32),
@@ -93,7 +93,7 @@ fn bench_serialize_signed_transaction(c: &mut Criterion) {
     let tx = SignedTransaction::new(
         vec![31u8; 128],
         vec![32u8; 65],
-        Address::from_slice_unchecked(&[33u8; 20]),
+        Address::from_slice_unchecked(&[33u8; 32]),
         42,
     );
 
@@ -152,6 +152,37 @@ fn bench_crypto_api_poseidon_hash_2(c: &mut Criterion) {
     });
 }
 
+/// Measures the time to create a disclosure witness.
+///
+/// This covers: 2× field element conversion + poseidon_hash_1 + mask evaluation.
+/// The target is < 100ms per witness.
+#[cfg(any(feature = "crypto-zk", feature = "crypto"))]
+fn bench_build_disclosure_witness(c: &mut Criterion) {
+    use orbinum_encrypted_memo::{DisclosureMask, MemoData};
+    use orbinum_protocol_core::application::disclosure::create_disclosure_witness;
+
+    let memo = MemoData::new(100_000_000u64, [0x11u8; 32], [0x99u8; 32], 0u32);
+    let commitment = [0x42u8; 32];
+    let mask = DisclosureMask {
+        disclose_value: true,
+        disclose_owner: true,
+        disclose_asset_id: true,
+        disclose_blinding: false,
+    };
+
+    c.bench_function("disclosure.create_witness", |b| {
+        b.iter(|| {
+            let w = create_disclosure_witness(
+                black_box(&memo),
+                black_box(&commitment),
+                black_box(&mask),
+            )
+            .expect("benchmark witness should succeed");
+            black_box(w)
+        })
+    });
+}
+
 #[cfg(feature = "crypto")]
 fn bench_sign_and_build_shield(c: &mut Criterion) {
     const PRIVATE_KEY_HEX: &str =
@@ -184,6 +215,7 @@ criterion_group!(
     bench_crypto_api_compute_commitment,
     bench_crypto_api_compute_nullifier,
     bench_crypto_api_poseidon_hash_2,
+    bench_build_disclosure_witness,
     bench_sign_and_build_shield
 );
 

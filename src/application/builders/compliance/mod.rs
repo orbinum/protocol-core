@@ -4,6 +4,7 @@
 pub mod approve_disclosure;
 pub mod audit_policy;
 pub mod batch_submit_disclosure;
+pub mod disclosure_flow;
 pub mod reject_disclosure;
 pub mod request_disclosure;
 pub mod submit_disclosure;

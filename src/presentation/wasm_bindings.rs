@@ -1,5 +1,7 @@
 //! WASM Bindings for JavaScript/TypeScript
 
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 #[cfg(target_arch = "wasm32")]
 use wasm_bindgen::prelude::*;
 
@@ -751,6 +753,121 @@ impl Crypto {
             .map_err(|e: String| JsValue::from_str(&e))?;
 
         Ok(hash.to_vec())
+    }
+
+    /// Builds all circuit inputs for the selective disclosure proof.
+    ///
+    /// Returns a JSON object with the following fields (all as hex strings):
+    /// - `commitment`, `revealed_value`, `revealed_asset_id`, `revealed_owner_hash`
+    ///   (public inputs – what the auditor receives)
+    /// - `value`, `asset_id`, `owner_pubkey`, `blinding`, `viewing_key`
+    ///   (private inputs – kept secret by the prover)
+    /// - `disclose_value`, `disclose_asset_id`, `disclose_owner` (booleans as 0/1 strings)
+    ///
+    /// The TypeScript consumer converts hex values to BigInt decimal strings before
+    /// passing them to snarkjs / groth16-proofs.
+    ///
+    /// # Parameters
+    ///
+    /// - `value`              – Note value (u64 as decimal string, e.g. `"100000000"`)
+    /// - `owner_pk`           – Owner public key (32 bytes)
+    /// - `blinding`           – Blinding factor (32 bytes)
+    /// - `asset_id`           – Asset ID (u32)
+    /// - `commitment`         – Note commitment (32 bytes)
+    /// - `disclose_value`     – Whether to reveal the value
+    /// - `disclose_owner`     – Whether to reveal the owner hash
+    /// - `disclose_asset_id`  – Whether to reveal the asset ID
+    #[cfg(any(feature = "crypto-zk", feature = "crypto"))]
+    #[wasm_bindgen(js_name = buildDisclosureInputs)]
+    pub fn build_disclosure_inputs(
+        value: String,
+        owner_pk: Vec<u8>,
+        blinding: Vec<u8>,
+        asset_id: u32,
+        commitment: Vec<u8>,
+        disclose_value: bool,
+        disclose_owner: bool,
+        disclose_asset_id: bool,
+    ) -> Result<JsValue, JsValue> {
+        use crate::application::disclosure::create_disclosure_witness;
+        use orbinum_encrypted_memo::{DisclosureMask, MemoData};
+
+        // Parse value
+        let value_u64: u64 = value
+            .parse()
+            .map_err(|_| JsValue::from_str("Invalid value: must be a u64 decimal string"))?;
+
+        // Validate byte slices
+        if owner_pk.len() != 32 {
+            return Err(JsValue::from_str("owner_pk must be 32 bytes"));
+        }
+        if blinding.len() != 32 {
+            return Err(JsValue::from_str("blinding must be 32 bytes"));
+        }
+        if commitment.len() != 32 {
+            return Err(JsValue::from_str("commitment must be 32 bytes"));
+        }
+
+        let mut owner_pk_bytes = [0u8; 32];
+        let mut blinding_bytes = [0u8; 32];
+        let mut commitment_bytes = [0u8; 32];
+        owner_pk_bytes.copy_from_slice(&owner_pk);
+        blinding_bytes.copy_from_slice(&blinding);
+        commitment_bytes.copy_from_slice(&commitment);
+
+        // Build domain types
+        let memo = MemoData::new(value_u64, owner_pk_bytes, blinding_bytes, asset_id);
+        let mask = DisclosureMask {
+            disclose_value,
+            disclose_owner,
+            disclose_asset_id,
+            disclose_blinding: false, // MUST always be false
+        };
+
+        // Build witness
+        let w = create_disclosure_witness(&memo, &commitment_bytes, &mask)
+            .map_err(|e| JsValue::from_str(&format!("{e}")))?;
+
+        // Helper: bytes to "0x{hex}" string
+        fn to_hex(b: &[u8; 32]) -> String {
+            let mut s = String::with_capacity(66);
+            s.push_str("0x");
+            for byte in b {
+                s.push_str(&format!("{byte:02x}"));
+            }
+            s
+        }
+
+        // Serialize to JS object
+        let obj = js_sys::Object::new();
+        macro_rules! set_hex {
+            ($key:expr, $val:expr) => {
+                js_sys::Reflect::set(&obj, &$key.into(), &to_hex($val).into())?;
+            };
+        }
+        macro_rules! set_bool {
+            ($key:expr, $val:expr) => {
+                js_sys::Reflect::set(&obj, &$key.into(), &(if $val { "1" } else { "0" }).into())?;
+            };
+        }
+
+        // Public inputs
+        set_hex!("commitment", &w.commitment);
+        set_hex!("revealed_value", &w.revealed_value);
+        set_hex!("revealed_asset_id", &w.revealed_asset_id);
+        set_hex!("revealed_owner_hash", &w.revealed_owner_hash);
+
+        // Private inputs
+        set_hex!("value", &w.value);
+        set_hex!("asset_id", &w.asset_id);
+        set_hex!("owner_pubkey", &w.owner_pubkey);
+        set_hex!("blinding", &w.blinding);
+        set_hex!("viewing_key", &w.viewing_key);
+        set_bool!("disclose_value", w.disclose_value);
+        set_bool!("disclose_asset_id", w.disclose_asset_id);
+        set_bool!("disclose_owner", w.disclose_owner);
+
+        Ok(obj.into())
     }
 }
 

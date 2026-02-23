@@ -6,9 +6,10 @@
 extern crate alloc;
 use alloc::vec::Vec;
 
-use orbinum_encrypted_memo::{
-    decrypt_memo, encrypt_memo_random, is_valid_encrypted_memo, MemoData,
-};
+use orbinum_encrypted_memo::{decrypt_memo, is_valid_encrypted_memo, MemoData};
+
+#[cfg(any(feature = "std", target_arch = "wasm32"))]
+use orbinum_encrypted_memo::encrypt_memo_random;
 
 /// Encrypts memo data for a recipient with automatic random nonce generation.
 ///
@@ -25,6 +26,7 @@ use orbinum_encrypted_memo::{
 ///
 /// # Returns
 /// Encrypted memo bytes (104 bytes: 12-byte nonce + 92-byte ciphertext)
+#[cfg(any(feature = "std", target_arch = "wasm32"))]
 pub fn create_encrypted_memo(
     value: u64,
     owner_pk: [u8; 32],
@@ -66,6 +68,7 @@ pub fn validate_encrypted_memo(encrypted: &[u8]) -> bool {
 /// Creates a dummy encrypted memo for testing.
 ///
 /// Returns a valid 104-byte encrypted memo with zero values.
+#[cfg(any(feature = "std", target_arch = "wasm32"))]
 pub fn create_dummy_encrypted_memo() -> Vec<u8> {
     let memo = MemoData::new(0, [0u8; 32], [0u8; 32], 0);
     let commitment = [0u8; 32];
@@ -80,6 +83,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[cfg(feature = "std")]
     fn test_encrypt_decrypt_roundtrip() {
         let value = 1000u64;
         let owner_pk = [1u8; 32];
@@ -110,6 +114,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "std")]
     fn test_validate_encrypted_memo() {
         let dummy = create_dummy_encrypted_memo();
         assert!(validate_encrypted_memo(&dummy));
@@ -128,6 +133,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "std")]
     fn test_dummy_encrypted_memo() {
         let dummy = create_dummy_encrypted_memo();
         assert_eq!(dummy.len(), 104);

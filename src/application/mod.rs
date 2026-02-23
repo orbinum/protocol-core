@@ -35,6 +35,12 @@ pub use key_manager::*;
 pub use memo_utils::*;
 pub use note_manager::*;
 
+// Selective Disclosure
+#[cfg(any(feature = "crypto-zk", feature = "crypto"))]
+pub mod disclosure;
+#[cfg(any(feature = "crypto-zk", feature = "crypto"))]
+pub use disclosure::{create_disclosure_witness, DisclosureError, DisclosureWitness};
+
 #[cfg(test)]
 mod tests {
     use super::*;
