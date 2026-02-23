@@ -35,6 +35,12 @@ pub use key_manager::*;
 pub use memo_utils::*;
 pub use note_manager::*;
 
+// Selective Disclosure
+#[cfg(any(feature = "crypto-zk", feature = "crypto"))]
+pub mod disclosure;
+#[cfg(any(feature = "crypto-zk", feature = "crypto"))]
+pub use disclosure::{create_disclosure_witness, DisclosureError, DisclosureWitness};
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -46,7 +52,7 @@ mod tests {
         assert!(TransactionValidator::validate_commitment(&commitment).is_ok());
 
         let auditors = vec![crate::application::params::AuditorInfo {
-            account: Address::from_slice_unchecked(&[1u8; 20]),
+            account: Address::from_slice_unchecked(&[1u8; 32]),
             public_key: None,
             authorized_from: 1,
         }];

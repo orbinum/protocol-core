@@ -74,7 +74,7 @@ mod tests {
         }
 
         fn address(&self) -> Address {
-            Address::from_slice_unchecked(&[3u8; 20])
+            Address::from_slice_unchecked(&[3u8; 32])
         }
 
         fn public_key(&self) -> PublicKey {
@@ -96,7 +96,7 @@ mod tests {
         let signature = signer.sign(&[9u8; 4]).unwrap();
 
         assert_eq!(signature.to_bytes().len(), 65);
-        assert_eq!(signer.address().as_bytes(), &[3u8; 20]);
+        assert_eq!(signer.address().as_bytes(), &[3u8; 32]);
         assert_eq!(signer.public_key().as_bytes(), &[4u8; 64]);
     }
 

@@ -66,7 +66,7 @@ pub mod option_address {
     where
         D: Deserializer<'de>,
     {
-        let bytes: Option<[u8; 20]> = Deserialize::deserialize(deserializer)?;
+        let bytes: Option<[u8; 32]> = Deserialize::deserialize(deserializer)?;
         Ok(bytes.map(|b| Address::from_slice_unchecked(&b)))
     }
 }
@@ -129,13 +129,13 @@ mod tests {
     #[test]
     fn test_option_address_adapter_some_roundtrip_json() {
         let original = OptionAddressWrapper {
-            address: Some(Address::from_slice_unchecked(&[9u8; 20])),
+            address: Some(Address::from_slice_unchecked(&[9u8; 32])),
         };
 
         let json = serde_json::to_string(&original).unwrap();
         let decoded: OptionAddressWrapper = serde_json::from_str(&json).unwrap();
 
-        assert_eq!(decoded.address.unwrap().as_bytes(), &[9u8; 20]);
+        assert_eq!(decoded.address.unwrap().as_bytes(), &[9u8; 32]);
     }
 
     #[test]

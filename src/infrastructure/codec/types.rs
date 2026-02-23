@@ -8,7 +8,7 @@ use codec::{Decode, Encode};
 
 /// Address codec wrapper.
 #[derive(Debug, Clone, PartialEq, Eq, Encode, Decode)]
-pub struct AddressCodec(pub [u8; 20]);
+pub struct AddressCodec(pub [u8; 32]);
 
 impl From<Address> for AddressCodec {
     fn from(addr: Address) -> Self {
@@ -207,7 +207,7 @@ mod tests {
 
     #[test]
     fn test_basic_codec_wrappers_roundtrip() {
-        let address = Address::from_slice_unchecked(&[1u8; 20]);
+        let address = Address::from_slice_unchecked(&[1u8; 32]);
         let hash = Hash::from_slice(&[2u8; 32]);
         let commitment = Commitment::from_bytes_unchecked([3u8; 32]);
         let nullifier = Nullifier::from_bytes_unchecked([4u8; 32]);
@@ -217,7 +217,7 @@ mod tests {
         let commitment_back: Commitment = CommitmentCodec::from(commitment).into();
         let nullifier_back: Nullifier = NullifierCodec::from(nullifier).into();
 
-        assert_eq!(address_back.as_bytes(), &[1u8; 20]);
+        assert_eq!(address_back.as_bytes(), &[1u8; 32]);
         assert_eq!(hash_back.as_bytes(), &[2u8; 32]);
         assert_eq!(commitment_back.as_bytes(), &[3u8; 32]);
         assert_eq!(nullifier_back.as_bytes(), &[4u8; 32]);
@@ -236,7 +236,7 @@ mod tests {
         let signed = SignedTransaction::new(
             vec![12u8, 13u8],
             vec![14u8; 65],
-            Address::from_slice_unchecked(&[15u8; 20]),
+            Address::from_slice_unchecked(&[15u8; 32]),
             8,
         );
         let signed_codec = SignedTransactionCodec::from(signed);
@@ -244,7 +244,7 @@ mod tests {
 
         assert_eq!(signed_back.call_data(), &[12u8, 13u8]);
         assert_eq!(signed_back.signature().len(), 65);
-        assert_eq!(signed_back.address().as_bytes(), &[15u8; 20]);
+        assert_eq!(signed_back.address().as_bytes(), &[15u8; 32]);
         assert_eq!(signed_back.nonce(), 8);
     }
 
@@ -261,13 +261,13 @@ mod tests {
         assert_eq!(shield_codec.amount, 100);
 
         let auditor = AuditorInfo {
-            account: Address::from_slice_unchecked(&[18u8; 20]),
+            account: Address::from_slice_unchecked(&[18u8; 32]),
             public_key: Some([19u8; 32]),
             authorized_from: 21,
         };
         let auditor_codec = AuditorInfoCodec::from(auditor);
         assert_eq!(auditor_codec.authorized_from, 21);
-        assert_eq!(auditor_codec.account.0, [18u8; 20]);
+        assert_eq!(auditor_codec.account.0, [18u8; 32]);
 
         let cond_amount =
             DisclosureConditionTypeCodec::from(DisclosureConditionType::AmountAbove(500));
@@ -303,10 +303,10 @@ mod tests {
 
     #[test]
     fn test_scale_encode_decode_for_codec_wrappers() {
-        let address_codec = AddressCodec([24u8; 20]);
+        let address_codec = AddressCodec([24u8; 32]);
         let encoded = address_codec.encode();
         let decoded = AddressCodec::decode(&mut &encoded[..]).unwrap();
-        assert_eq!(decoded.0, [24u8; 20]);
+        assert_eq!(decoded.0, [24u8; 32]);
 
         let condition_codec = DisclosureConditionTypeCodec::ManualApproval;
         let encoded_cond = condition_codec.encode();

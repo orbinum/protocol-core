@@ -70,12 +70,9 @@ use ::core::fmt;
 use ::core::result;
 use alloc::string::String;
 
-// Panic handler for no_std
 #[cfg(not(feature = "std"))]
-#[panic_handler]
-fn panic(_info: &core::panic::PanicInfo) -> ! {
-    loop {}
-}
+#[allow(unused_imports)]
+use alloc::format;
 
 // Global allocator for no_std (WASM will use wasm allocator)
 #[cfg(all(not(feature = "std"), target_arch = "wasm32"))]

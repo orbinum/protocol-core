@@ -54,7 +54,7 @@ mod tests {
         let call_data = vec![1, 2, 3];
         let unsigned_tx = UnsignedTransaction::new(call_data, 0);
         let signature = vec![4u8; 65]; // ECDSA signature must be 65 bytes
-        let address = Address::from_slice_unchecked(&[7u8; 20]);
+        let address = Address::from_slice_unchecked(&[7u8; 32]);
 
         let signed_tx = ExtrinsicBuilder::build_signed(unsigned_tx, &signature, address);
 
@@ -66,7 +66,7 @@ mod tests {
         let call_data = vec![1, 2, 3];
         let unsigned_tx = UnsignedTransaction::new(call_data, 0);
         let signature = vec![4u8; 65]; // ECDSA signature must be 65 bytes
-        let address = Address::from_slice_unchecked(&[7u8; 20]);
+        let address = Address::from_slice_unchecked(&[7u8; 32]);
 
         let signed_tx = ExtrinsicBuilder::build_signed(unsigned_tx, &signature, address);
         let serialized = ExtrinsicBuilder::serialize(&signed_tx);

@@ -3,7 +3,7 @@
 //! Unified error types for transaction building and signing operations.
 
 extern crate alloc;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use core::fmt;
 
 // Builder Errors

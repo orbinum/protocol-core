@@ -200,7 +200,7 @@ mod tests {
         }
 
         fn address(&self) -> Address {
-            Address::from_slice_unchecked(&[34u8; 20])
+            Address::from_slice_unchecked(&[34u8; 32])
         }
 
         fn public_key(&self) -> PublicKey {

@@ -67,7 +67,7 @@ mod tests {
         let params = UnshieldParams {
             nullifier: Nullifier::from_bytes_unchecked([2u8; 32]),
             amount: 500u128,
-            recipient: Address::from_slice_unchecked(&[3u8; 20]),
+            recipient: Address::from_slice_unchecked(&[3u8; 32]),
             root: Hash::from_slice(&[4u8; 32]),
             proof: vec![5u8; 128],
         };
@@ -86,7 +86,7 @@ mod tests {
     fn test_unshield_with_proof_sizes() {
         let encoder = SubstrateTransactionEncoder::new();
         let nullifier = Nullifier::from_bytes_unchecked([2u8; 32]);
-        let recipient = Address::from_slice_unchecked(&[3u8; 20]);
+        let recipient = Address::from_slice_unchecked(&[3u8; 32]);
         let root = Hash::from_slice(&[4u8; 32]);
 
         let params_small = UnshieldParams {
@@ -119,7 +119,7 @@ mod tests {
         let params = UnshieldParams {
             nullifier: Nullifier::from_bytes_unchecked([12u8; 32]),
             amount: 900,
-            recipient: Address::from_slice_unchecked(&[13u8; 20]),
+            recipient: Address::from_slice_unchecked(&[13u8; 32]),
             root: Hash::from_slice(&[14u8; 32]),
             proof: vec![15u8; 128],
         };
@@ -140,7 +140,7 @@ mod tests {
         }
 
         fn address(&self) -> Address {
-            Address::from_slice_unchecked(&[18u8; 20])
+            Address::from_slice_unchecked(&[18u8; 32])
         }
 
         fn public_key(&self) -> PublicKey {
@@ -155,7 +155,7 @@ mod tests {
         let params = UnshieldParams {
             nullifier: Nullifier::from_bytes_unchecked([20u8; 32]),
             amount: 1500,
-            recipient: Address::from_slice_unchecked(&[21u8; 20]),
+            recipient: Address::from_slice_unchecked(&[21u8; 32]),
             root: Hash::from_slice(&[22u8; 32]),
             proof: vec![23u8; 128],
         };

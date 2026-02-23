@@ -3,28 +3,32 @@
 //! Provides high-level functions for deriving and managing cryptographic keys
 //! in the Orbinum wallet.
 
-use orbinum_encrypted_memo::{derive_eddsa_key, derive_nullifier_key, derive_viewing_key, KeySet};
+use orbinum_encrypted_memo::{
+    derive_eddsa_key_from_spending as derive_eddsa_key,
+    derive_nullifier_key_from_spending as derive_nullifier_key,
+    derive_viewing_key_from_spending as derive_viewing_key, KeySet,
+};
 
 /// Derives viewing key from spending key.
 ///
 /// The viewing key allows reading all transactions but cannot spend funds.
 /// Safe to share with auditors for compliance purposes.
 pub fn derive_viewing_key_from_spending(spending_key: &[u8; 32]) -> [u8; 32] {
-    derive_viewing_key(spending_key)
+    *derive_viewing_key(spending_key).as_bytes()
 }
 
 /// Derives nullifier key from spending key.
 ///
 /// Used to compute nullifiers for spending notes. Must be kept secret.
 pub fn derive_nullifier_key_from_spending(spending_key: &[u8; 32]) -> [u8; 32] {
-    derive_nullifier_key(spending_key)
+    *derive_nullifier_key(spending_key).as_bytes()
 }
 
 /// Derives EdDSA signing key from spending key.
 ///
 /// Used for circuit signatures in ZK proofs. Must be kept secret.
 pub fn derive_eddsa_key_from_spending(spending_key: &[u8; 32]) -> [u8; 32] {
-    derive_eddsa_key(spending_key)
+    *derive_eddsa_key(spending_key).as_bytes()
 }
 
 /// Derives complete keyset from spending key.

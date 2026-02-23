@@ -31,7 +31,7 @@ mod tests {
     fn test_request_disclosure_build_unsigned() {
         let encoder = SubstrateTransactionEncoder::new();
         let params = RequestDisclosureParams {
-            target: Address::from_slice_unchecked(&[15u8; 20]),
+            target: Address::from_slice_unchecked(&[15u8; 32]),
             reason: b"Suspicious pattern".to_vec(),
             evidence: Some(vec![42u8; 12]),
         };
@@ -47,7 +47,7 @@ mod tests {
     #[test]
     fn test_request_disclosure_evidence_option_changes_encoding() {
         let encoder = SubstrateTransactionEncoder::new();
-        let target = Address::from_slice_unchecked(&[16u8; 20]);
+        let target = Address::from_slice_unchecked(&[16u8; 32]);
         let reason = b"Regulatory request".to_vec();
 
         let with_evidence = RequestDisclosureBuilder::build_unsigned(

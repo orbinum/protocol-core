@@ -160,7 +160,7 @@ mod tests {
         let unshield = UnshieldParams {
             nullifier: Nullifier::from_bytes_unchecked([2u8; 32]),
             amount: 50,
-            recipient: Address::from_slice_unchecked(&[3u8; 20]),
+            recipient: Address::from_slice_unchecked(&[3u8; 32]),
             root: Hash::from_slice(&[4u8; 32]),
             proof: vec![5u8; 64],
         };
@@ -217,7 +217,7 @@ mod tests {
     fn test_compliance_params_construction() {
         let params = SetAuditPolicyParams {
             auditors: vec![AuditorInfo {
-                account: Address::from_slice_unchecked(&[18u8; 20]),
+                account: Address::from_slice_unchecked(&[18u8; 32]),
                 public_key: Some([19u8; 32]),
                 authorized_from: 100,
             }],
@@ -255,14 +255,14 @@ mod tests {
     #[test]
     fn test_disclosure_transaction_params_construction() {
         let request = RequestDisclosureParams {
-            target: Address::from_slice_unchecked(&[20u8; 20]),
+            target: Address::from_slice_unchecked(&[20u8; 32]),
             reason: b"regulatory request".to_vec(),
             evidence: Some(vec![21u8; 4]),
         };
         assert!(request.evidence.is_some());
 
         let approve = ApproveDisclosureParams {
-            auditor: Address::from_slice_unchecked(&[22u8; 20]),
+            auditor: Address::from_slice_unchecked(&[22u8; 32]),
             commitment: Commitment::from_bytes_unchecked([23u8; 32]),
             zk_proof: vec![24u8; 64],
             disclosed_data: vec![25u8; 12],
@@ -270,7 +270,7 @@ mod tests {
         assert_eq!(approve.zk_proof.len(), 64);
 
         let reject = RejectDisclosureParams {
-            auditor: Address::from_slice_unchecked(&[26u8; 20]),
+            auditor: Address::from_slice_unchecked(&[26u8; 32]),
             reason: b"insufficient basis".to_vec(),
         };
         assert!(!reject.reason.is_empty());
@@ -280,7 +280,7 @@ mod tests {
             proof_bytes: vec![28u8; 64],
             public_signals: vec![29u8; 16],
             partial_data: vec![30u8; 8],
-            auditor: Some(Address::from_slice_unchecked(&[31u8; 20])),
+            auditor: Some(Address::from_slice_unchecked(&[31u8; 32])),
         };
         assert!(submit.auditor.is_some());
 

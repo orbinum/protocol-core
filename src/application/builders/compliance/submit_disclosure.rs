@@ -35,7 +35,7 @@ mod tests {
             proof_bytes: vec![1u8; 96],
             public_signals: vec![2u8; 48],
             partial_data: vec![3u8; 24],
-            auditor: Some(Address::from_slice_unchecked(&[24u8; 20])),
+            auditor: Some(Address::from_slice_unchecked(&[24u8; 32])),
         };
 
         let tx = SubmitDisclosureBuilder::build_unsigned(&encoder, params, 61);
@@ -58,7 +58,7 @@ mod tests {
                 proof_bytes: vec![4u8; 64],
                 public_signals: vec![5u8; 32],
                 partial_data: vec![6u8; 16],
-                auditor: Some(Address::from_slice_unchecked(&[26u8; 20])),
+                auditor: Some(Address::from_slice_unchecked(&[26u8; 32])),
             },
             0,
         );

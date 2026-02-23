@@ -9,6 +9,10 @@ use crate::domain::ports::{HashPort, SignerError, SignerPort};
 use crate::domain::types::*;
 
 #[cfg(any(feature = "crypto-signing", feature = "crypto"))]
+use blake2::digest::consts::U32;
+#[cfg(any(feature = "crypto-signing", feature = "crypto"))]
+use blake2::{Blake2b, Digest};
+#[cfg(any(feature = "crypto-signing", feature = "crypto"))]
 use libsecp256k1::{Message, PublicKey as Secp256k1PublicKey, SecretKey as Secp256k1SecretKey};
 #[cfg(any(feature = "crypto-signing", feature = "crypto"))]
 use tiny_keccak::{Hasher, Keccak};
@@ -16,13 +20,22 @@ use tiny_keccak::{Hasher, Keccak};
 // Imports for ZK operations (Poseidon, commitments)
 #[cfg(any(feature = "crypto-zk", feature = "crypto"))]
 use orbinum_zk_core::{
-    domain::ports::PoseidonHasher, Blinding, FieldElement, LightPoseidonHasher, Note, NoteDto,
-    OwnerPubkey,
+    domain::ports::PoseidonHasher, poseidon_hash_1 as zk_poseidon_hash_1, Blinding, FieldElement,
+    LightPoseidonHasher, Note, NoteDto, OwnerPubkey,
 };
+
+use alloc::string::String;
 
 /// ZK cryptography provider using orbinum-zk-core.
 #[cfg(any(feature = "crypto-zk", feature = "crypto"))]
 pub struct ZkCryptoProvider;
+
+#[cfg(any(feature = "crypto-zk", feature = "crypto"))]
+impl Default for ZkCryptoProvider {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 #[cfg(any(feature = "crypto-zk", feature = "crypto"))]
 impl ZkCryptoProvider {
@@ -31,7 +44,7 @@ impl ZkCryptoProvider {
     }
 
     /// Converts bytes to FieldElement using NoteDto roundtrip.
-    fn bytes_to_field(bytes: [u8; 32]) -> Result<FieldElement, String> {
+    pub(crate) fn bytes_to_field(bytes: [u8; 32]) -> Result<FieldElement, String> {
         // Create DTO with bytes in owner_pubkey field
         let dto = NoteDto::new(0, 0, bytes, [0u8; 32]);
         // Convert to domain (validates and converts)
@@ -41,7 +54,7 @@ impl ZkCryptoProvider {
     }
 
     /// Converts FieldElement to bytes using NoteDto roundtrip.
-    fn field_to_bytes(field: FieldElement) -> [u8; 32] {
+    pub(crate) fn field_to_bytes(field: FieldElement) -> [u8; 32] {
         // Create Note with field in owner_pubkey
         // Use from_u64(0) instead of zero() to be safe if zero() is not exposed on Blinding
         let note = Note::new(
@@ -56,7 +69,7 @@ impl ZkCryptoProvider {
     }
 
     pub fn get_note_commitment(&self, note: &Note) -> [u8; 32] {
-        let hasher = LightPoseidonHasher::default();
+        let hasher = LightPoseidonHasher;
         let commitment = note.commitment(hasher);
         Self::field_to_bytes(commitment.inner())
     }
@@ -100,7 +113,7 @@ impl ZkCryptoProvider {
         let commitment_field = Self::bytes_to_field(commitment)?;
         let spending_key_field = Self::bytes_to_field(spending_key)?;
 
-        let hasher = LightPoseidonHasher::default();
+        let hasher = LightPoseidonHasher;
         let nullifier = hasher.hash_2([commitment_field, spending_key_field]);
 
         Ok(Self::field_to_bytes(nullifier))
@@ -110,7 +123,7 @@ impl ZkCryptoProvider {
         let left_field = Self::bytes_to_field(left)?;
         let right_field = Self::bytes_to_field(right)?;
 
-        let hasher = LightPoseidonHasher::default();
+        let hasher = LightPoseidonHasher;
         let result = hasher.hash_2([left_field, right_field]);
 
         Ok(Self::field_to_bytes(result))
@@ -122,10 +135,27 @@ impl ZkCryptoProvider {
             field_inputs[i] = Self::bytes_to_field(*input)?;
         }
 
-        let hasher = LightPoseidonHasher::default();
+        let hasher = LightPoseidonHasher;
         let result = hasher.hash_4(field_inputs);
 
         Ok(Self::field_to_bytes(result))
+    }
+
+    /// Computes Poseidon(1) of a single 32-byte input.
+    ///
+    /// Used to derive `viewing_key = Poseidon(owner_pubkey)` for the disclosure circuit.
+    /// This matches `Poseidon(1)` from circom/circomlibjs.
+    pub fn poseidon_hash_1(&self, input: [u8; 32]) -> Result<[u8; 32], String> {
+        let input_field = Self::bytes_to_field(input)?;
+        let result = zk_poseidon_hash_1(input_field);
+        Ok(Self::field_to_bytes(result))
+    }
+
+    /// Converts a u64 value to a 32-byte field element representation.
+    ///
+    /// Used to encode `value` and `asset_id` as circuit field elements.
+    pub(crate) fn u64_to_field_bytes(value: u64) -> [u8; 32] {
+        Self::field_to_bytes(FieldElement::from_u64(value))
     }
 }
 
@@ -154,18 +184,24 @@ pub struct EcdsaSigner {
 
 #[cfg(any(feature = "crypto-signing", feature = "crypto"))]
 impl EcdsaSigner {
-    /// Crea un signer desde una clave privada
+    /// Creates a signer from a private key
     pub fn from_secret_key(secret: &SecretKey) -> Result<Self, SignerError> {
         let secret_key = Secp256k1SecretKey::parse_slice(secret.as_bytes())
             .map_err(|_| SignerError::InvalidKey)?;
 
         let public_key = Secp256k1PublicKey::from_secret_key(&secret_key);
 
-        // Derivar dirección Ethereum: keccak256(pubkey)[12..]
-        let pubkey_bytes = public_key.serialize();
-        let hash = Keccak256Hasher::keccak256(&pubkey_bytes[1..]); // Sin el prefijo 0x04
-        let address =
-            Address::from_slice(&hash.as_bytes()[12..]).map_err(|_| SignerError::InvalidKey)?;
+        // Derive AccountId32: blake2_256(compressed_pubkey_33_bytes)
+        // This matches Substrate’s derivation for ECDSA accounts:
+        // AccountId32 = blake2_256(compressed_secp256k1_pubkey)
+        let pubkey_uncompressed = public_key.serialize(); // [u8; 65]: 0x04 || x || y
+        let y_odd = pubkey_uncompressed[64] & 1;
+        let prefix = if y_odd == 0 { 0x02u8 } else { 0x03u8 };
+        let mut compressed = [0u8; 33];
+        compressed[0] = prefix;
+        compressed[1..].copy_from_slice(&pubkey_uncompressed[1..33]);
+        let account_id: [u8; 32] = Blake2b::<U32>::digest(compressed).into();
+        let address = Address(account_id);
 
         Ok(EcdsaSigner {
             secret_key,
@@ -247,8 +283,8 @@ mod tests {
         let signer = signer.unwrap();
         let addr = signer.address();
 
-        // Verificar que la dirección tiene 20 bytes
-        assert_eq!(addr.as_bytes().len(), 20);
+        // Check that the address is 32 bytes (AccountId32)
+        assert_eq!(addr.as_bytes().len(), 32);
     }
 
     #[test]

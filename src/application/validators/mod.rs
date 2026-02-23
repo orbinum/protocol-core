@@ -19,7 +19,7 @@ mod tests {
         assert!(TransactionValidator::validate_commitment(&commitment).is_ok());
 
         let auditors = vec![AuditorInfo {
-            account: Address::from_slice_unchecked(&[1u8; 20]),
+            account: Address::from_slice_unchecked(&[1u8; 32]),
             public_key: None,
             authorized_from: 1,
         }];

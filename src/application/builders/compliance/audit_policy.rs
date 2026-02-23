@@ -32,7 +32,7 @@ mod tests {
         let encoder = SubstrateTransactionEncoder::new();
         let params = SetAuditPolicyParams {
             auditors: vec![AuditorInfo {
-                account: Address::from_slice_unchecked(&[5u8; 20]),
+                account: Address::from_slice_unchecked(&[5u8; 32]),
                 public_key: Some([6u8; 32]),
                 authorized_from: 100,
             }],
@@ -55,7 +55,7 @@ mod tests {
     fn test_set_audit_policy_option_encoding_changes() {
         let encoder = SubstrateTransactionEncoder::new();
         let auditors = vec![AuditorInfo {
-            account: Address::from_slice_unchecked(&[7u8; 20]),
+            account: Address::from_slice_unchecked(&[7u8; 32]),
             public_key: None,
             authorized_from: 0,
         }];

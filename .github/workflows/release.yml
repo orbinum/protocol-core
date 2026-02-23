@@ -62,12 +62,17 @@ jobs:
           cargo check --features "crypto,subxt-native"
           cargo test --features crypto-zk
 
+      - name: Build WASM package (web)
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          wasm-pack build --target web --out-dir pkg/web --release --no-opt --features crypto-zk
+
       - name: Build WASM package (nodejs)
         if: steps.check_tag.outputs.exists == 'false'
         run: |
-          wasm-pack build --target nodejs --out-dir pkg --release --no-opt --features crypto-zk
+          wasm-pack build --target nodejs --out-dir pkg/node --release --no-opt --features crypto-zk
 
-      - name: Prepare npm package metadata
+      - name: Prepare universal npm package
         if: steps.check_tag.outputs.exists == 'false'
         run: |
           node <<'NODE'
@@ -79,12 +84,13 @@ jobs:
           if (!versionMatch) throw new Error('Version not found in Cargo.toml');
           const version = versionMatch[1];
 
-          const pkgPath = path.join('pkg', 'package.json');
+          // Use package.json from one of the builds as base template
+          const pkgPath = path.join('pkg', 'web', 'package.json');
           const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
 
           pkg.name = '@orbinum/protocol-core';
           pkg.version = version;
-          pkg.description = 'Core protocol primitives and WASM bindings for interacting with Orbinum';
+          pkg.description = 'Core protocol primitives and WASM bindings for interacting with Orbinum (Universal: Node + Web)';
           pkg.license = 'Apache-2.0 OR GPL-3.0-or-later';
           pkg.repository = {
             type: 'git',
@@ -93,17 +99,38 @@ jobs:
           pkg.homepage = 'https://github.com/orbinum/protocol-core';
           pkg.publishConfig = { access: 'public' };
           pkg.keywords = ['orbinum', 'protocol', 'wasm', 'substrate', 'zk'];
+          
+          // Hybrid/Universal configuration
+          pkg.main = './node/orbinum_protocol_core.js';
+          pkg.module = './web/orbinum_protocol_core.js';
+          pkg.types = './web/orbinum_protocol_core.d.ts'; // Types are identical
+          
+          pkg.files = ['web', 'node', 'README.md', 'LICENSE'];
 
-          fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
+          pkg.exports = {
+            ".": {
+              "browser": "./web/orbinum_protocol_core.js",
+              "node": "./node/orbinum_protocol_core.js",
+              "default": "./web/orbinum_protocol_core.js"
+            }
+          };
+
+          // Write new package.json to root pkg dir
+          fs.writeFileSync(path.join('pkg', 'package.json'), JSON.stringify(pkg, null, 2) + '\n');
           NODE
 
+          # Copy artifacts to root pkg structure
           cp README.md pkg/README.md
+          # LICENSE usually copied by wasm-pack, but let's be sure to have it in root pkg if needed
+          # (wasm-pack puts it inside web/ and node/, good to have one at top level too?)
+          # For publishing, npm ignores root files not in 'files' array, but 'pkg' folder is what we publish.
+
 
       - name: Create release asset
         if: steps.check_tag.outputs.exists == 'false'
         run: |
-          tar -czf orbinum-protocol-core-${{ steps.version.outputs.version }}-wasm-nodejs.tar.gz -C pkg .
-          ls -lh orbinum-protocol-core-${{ steps.version.outputs.version }}-wasm-nodejs.tar.gz
+          tar -czf orbinum-protocol-core-${{ steps.version.outputs.version }}-universal.tar.gz -C pkg .
+          ls -lh orbinum-protocol-core-${{ steps.version.outputs.version }}-universal.tar.gz
 
       - name: Ensure CHANGELOG.md exists
         if: steps.check_tag.outputs.exists == 'false'
@@ -169,14 +196,14 @@ jobs:
         with:
           tag_name: ${{ steps.version.outputs.tag }}
           name: Release ${{ steps.version.outputs.version }}
-          files: orbinum-protocol-core-${{ steps.version.outputs.version }}-wasm-nodejs.tar.gz
+          files: orbinum-protocol-core-${{ steps.version.outputs.version }}-universal.tar.gz
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Clean local release artifact before cargo publish
         if: steps.check_tag.outputs.exists == 'false'
-        run: rm -f orbinum-protocol-core-${{ steps.version.outputs.version }}-wasm-nodejs.tar.gz
+        run: rm -f orbinum-protocol-core-${{ steps.version.outputs.version }}-universal.tar.gz
 
       - name: Publish crate to crates.io
         if: steps.check_tag.outputs.exists == 'false'

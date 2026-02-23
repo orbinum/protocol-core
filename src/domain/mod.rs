@@ -14,10 +14,10 @@ mod tests {
 
     #[test]
     fn test_domain_reexports_types_and_entities() {
-        let address = Address::from_slice_unchecked(&[1u8; 20]);
+        let address = Address::from_slice_unchecked(&[1u8; 32]);
         let unsigned = UnsignedTransaction::new(vec![1u8], 0);
 
-        assert_eq!(address.as_bytes(), &[1u8; 20]);
+        assert_eq!(address.as_bytes(), &[1u8; 32]);
         assert_eq!(unsigned.nonce(), 0);
     }
 

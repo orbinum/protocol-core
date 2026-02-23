@@ -1,4 +1,4 @@
-.PHONY: all build test check clean wasm wasm-node examples doc help
+.PHONY: all build test check clean wasm wasm-node wasm-all examples doc help
 
 # Default target
 all: check test
@@ -27,7 +27,7 @@ check:
 clean:
 	@echo "🧹 Cleaning..."
 	@cargo clean
-	@rm -rf pkg pkg-node
+	@rm -rf pkg pkg-node target
 	@echo "✅ Clean complete"
 
 # Build WASM for web (with ZK crypto, no signing)
@@ -68,7 +68,7 @@ help:
 	@echo "  make test        - Run all tests"
 	@echo "  make check       - Check code and run clippy"
 	@echo "  make clean       - Clean build artifacts"
-	@echo "  make wasm        - Build WASM for web"
+	@echo "  make wasm        - Build WASM for web (--target web, crypto-zk)
 	@echo "  make wasm-node   - Build WASM for Node.js"
 	@echo "  make wasm-all    - Build all WASM targets"
 	@echo "  make fmt         - Format code"

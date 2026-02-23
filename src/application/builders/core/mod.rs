@@ -54,7 +54,7 @@ mod tests {
             UnshieldParams {
                 nullifier: Nullifier::from_bytes_unchecked([11u8; 32]),
                 amount: 50,
-                recipient: Address::from_slice_unchecked(&[12u8; 20]),
+                recipient: Address::from_slice_unchecked(&[12u8; 32]),
                 root: Hash::from_slice(&[13u8; 32]),
                 proof: vec![14u8; 64],
             },

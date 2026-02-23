@@ -3,6 +3,8 @@
 
 use crate::application::errors::ValidationError;
 use crate::domain::types::{Commitment, Nullifier};
+use alloc::format;
+use alloc::string::ToString;
 
 /// Validator for transaction parameters
 pub struct TransactionValidator;
